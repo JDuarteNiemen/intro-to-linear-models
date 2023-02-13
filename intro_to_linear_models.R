@@ -25,4 +25,45 @@ broom::tidy(lsmodel1)
 
 summary(lsmodel1)
 
-# continue intro to lieanr models from the graph bit.
+darwin %>%
+  ggplot(aes(x=type,
+             y=height,
+             colour=type))+
+  geom_jitter(alpha=0.5,
+              width=0.1)+
+  stat_summary(fun=mean,
+               size=1.2)+
+  theme_bw()
+
+#confidence intervals
+
+broom::tidy(lsmodel1, conf.int=T, conf.level=0.99)
+
+
+#calculating the other condition mean
+
+darwin%>%
+  mutate(type=factor(type))%>%
+  mutate(type=fct_relevel(type, c("Self", "Cross"))) %>%
+  lm(height~type, data=.) %>%
+  broom::tidy()
+
+means <- emmeans::emmeans(lsmodel1, specs = ~type)
+means
+
+
+means %>%
+  as_tibble() %>%
+  ggplot(aes(x=type,
+             y=emmean))+
+  geom_pointrange(aes(
+    ymin=lower.CL,
+    ymax=upper.CL))
+
+plot(lsmodel1)
+
+performance::check_model(lsmodel1)
+
+
+performance::check_model(lsmodel1, check=c("normality","qq"))
+
